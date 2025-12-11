@@ -1,72 +1,95 @@
+
+import json
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# -------------------------------------------
-# ANÁLISIS 1: ENTREGAS POR AGENTE
-#-------------------------------------------
-def analisis_entregas_por_agente():
-
+def entregas_por_agente(entregas, agentes):
     try:
-        
-            df_agentes = pd.read_json("agentes.json")
-            df_entregas = pd.read_json("entregas.json")
-            df_clientes = pd.read_json("clientes.json")
+        for id_agente, agente in enumerate(agentes, start=1):
+            agente["id_agente"] = id_agente
             
-            # Limpiar nombres de columnas
-            for df in [df_entregas, df_agentes, df_clientes,]:
-                df.columns = df.columns.str.strip().lower().titile()
+        for entrega in entregas:
+            entrega["id_agente"] = int(entrega["id_agente"])
 
-            print("✓ Datos cargados correctamente")
-            print(f"  - Entregas: {len(df_entregas)}")
-            print(f"  - Agentes: {len(df_agentes)}")
-            print(f"  - Clientes: {len(df_clientes)}")
-            
-                # Cargar datos limpios
-                
+        conteo = {}
+        for entrega in entregas:
+            id_agente = entrega["id_agente"]
+            conteo[id_agente] = conteo.get(id_agente, 0) + 1
 
-            print("\n" + "=" * 60)
-            print("📊 ANÁLISIS 1: Entregas por Agente")
-            print("=" * 60)
-
-            # Contar entregas por agente
-            conteo_entregas = df_entregas['id_agente'].value_counts().reset_index()
-            conteo_entregas.columns = ['id_agente', 'cantidad_entregas']
-
-                # Unir con nombres de agentes
-            df_agente_entregas = pd.merge(
-                conteo_entregas, 
-                df_agentes[['id_agente', 'nom_agente']], 
-                on='id_agente', 
-                how='left'
-            )
-
-                # Ordenar de mayor a menor
-            df_agente_entregas = df_agente_entregas.sort_values(by='cantidad_entregas', ascending=False)
-
-            print("\nTop 5 agentes con más entregas:")
-            print(df_agente_entregas.head())
-
-            # Gráfico
-            fig, ax = plt.subplots(figsize=(12, 6))
-            ax.bar(df_agente_entregas['nom_agente'], 
-                df_agente_entregas['cantidad_entregas'], 
-                color='cornflowerblue', 
-                edgecolor='black', 
-                alpha=0.7)
-
-            ax.set_title("Cantidad de Entregas por Agente", fontsize=16, fontweight='bold')
-            ax.set_xlabel("Agente", fontsize=12)
-            ax.set_ylabel("Cantidad de Entregas", fontsize=12)
-
-            # Agregar valores encima de cada barra
-            for i, v in enumerate(df_agente_entregas['cantidad_entregas']):
-                    ax.text(i, v + 1, str(v), ha='center', va='bottom', fontweight='bold')
-                    plt.xticks(rotation=45, ha='right')
-                    plt.tight_layout()
-                    plt.savefig("entregas_por_agente.png", dpi=300, bbox_inches='tight')
-                    plt.show()
-
-    except FileNotFoundError as e:
-        print(f"Error: {e}. Asegúrate de que los archivos JSON existen.") 
+        print("\n📦 Entregas por agente:")
+        for agente in agentes:
+            id_a = int(agente["id_agente"])
+            nombre = agente["nombre"].strip().title()
+            print(f"👤 {nombre}: {conteo.get(id_a, 0)} entregas")
+        return conteo
     except Exception as e:
-        print(f"Ocurrió un error durante el análisis: {e}") 
+        print("❌ Error en entregas_por_agente:", e)
+        return {}
+
+
+def peso_promedio_por_agente(entregas, agentes):
+    try:
+        # Normalización: asegurar que peso esté como número
+        for entrega in entregas:
+            entrega["peso_kg"] = float(entrega["peso_kg"])
+            entrega["id_agente"] = int(entrega["id_agente"])
+
+        total_pesos = {}
+        conteo = {}
+
+        for entrega in entregas:
+            id_agente = entrega["id_agente"]
+            peso = entrega["peso_kg"]
+            total_pesos[id_agente] = total_pesos.get(id_agente, 0) + peso
+            conteo[id_agente] = conteo.get(id_agente, 0) + 1
+
+        print("\n⚖️ Peso promedio por agente:")
+        for agente in agentes:
+            id_a = int(agente["id_agente"])
+            nombre = agente["nombre"].strip().title()
+            if conteo.get(id_a, 0) > 0:
+                promedio = total_pesos[id_a] / conteo[id_a]
+                print(f"👤 {nombre}: {promedio:.2f} kg")
+    except Exception as e:
+        print("❌ Error en peso_promedio_por_agente:", e)
+        
+        
+def total_pago_por_agente(entregas, agentes):
+    try:
+        # Normalización: convertir total a float
+        for entrega in entregas:
+            entrega["id_agente"] = int(entrega["id_agente"])
+            entrega["total_pago"] = float(entrega["total_pago"])
+
+        totales = {}
+        for entrega in entregas:
+            id_agente = entrega["id_agente"]
+            pago = entrega["total_pago"]
+            totales[id_agente] = totales.get(id_agente, 0) + pago
+
+        print("\n💰 Total cobrado por agente:")
+        for agente in agentes:
+            id_a = int(agente["id_agente"])
+            nombre = agente["nombre"].strip().title()
+            print(f"👤 {nombre}: ₡{totales.get(id_a, 0):,.2f}")
+    except Exception as e:
+        print("❌ Error en total_pago_por_agente:", e)
+        
+        
+def entregas_por_dia(entregas):
+    try:
+        # Normalización: asegurar que la fecha tenga formato datetime
+        df = pd.DataFrame(entregas)
+        df["fecha"] = pd.to_datetime(df["fecha"], errors="coerce")
+        df["dia_semana"] = df["fecha"].dt.day_name()
+
+        conteo = df["dia_semana"].value_counts().sort_index()
+
+        print("\n📅 Entregas por día de la semana:")
+        for dia, cantidad in conteo.items():
+            print(f"📆 {dia}: {cantidad} entregas")
+        return conteo
+    except Exception as e:
+        print("❌ Error en entregas_por_dia:", e)
+        return {}
+    

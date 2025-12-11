@@ -1,90 +1,102 @@
 [
-    [
-        "Carlos",
-        "Rojas",
-        "Jimenez",
-        "carjim_12@gmail.com",
-        "208660215",
-        "800mts norte del templo catolico, Palmares",
-        "3"
-    ],
-    [
-        "Miguel",
-        "Rodriguez",
-        "miguerod_15@gmail.com",
-        "207580314",
-        "Al costado oeste de almacenes el rey, San Ramon",
-        "1"
-    ],
-    [
-        "Andrea",
-        "Pacheco",
-        "Hernandez",
-        "andrepach_02@gmail.com",
-        "106870925",
-        "200mts norte del antiguo edificio de transito, San Ramon",
-        "2"
-    ],
-    [
-        "Catalina",
-        "Fernandez",
-        "Oviedo",
-        "catafer_20@gmail.com",
-        "207900531",
-        "350mts suroeste de la impenta Acosta, Palmares",
-        "4"
-    ],
-    [
-        "Diego",
-        "Paniagua",
-        "Guillen",
-        "diepan_19@gmail.com",
-        "207654321",
-        "Contiguo a las oficinas de la CCSS, San  Ramón",
-        "1"
-    ],
-    [
-        "Sofia",
-        "Arias",
-        "Sanchez",
-        "sofisanch_05@gmail.com",
-        "206870925",
-        "Costado sur de la iglesia catolica, Alajuela, Palmares",
-        "3"
-    ],
-    [
-        "Ricardo",
-        "Artavia",
-        "richiart_10@gmail.com",
-        "209135705",
-        "Esquina oeste del bar de Quillo,Palmares",
-        "3"
-    ],
-    [
-        "Pablo",
-        "Vasquez",
-        "Mora",
-        "pablovas_56@gmail.com",
-        "206870932",
-        "25mts oeste de la esquina suroeste del parque, San Ramon",
-        "1"
-    ],
-    [
-        "Maria",
-        "Salas",
-        "Cespedes",
-        "marices_78@gmail.com",
-        "203456789",
-        "25 mts oeste de correos de Costa Rica, Palmares",
-        "3"
-    ],
-    [
-        "Karla",
-        "Loria",
-        "Suarez",
-        "Karlori_16@gmail.com",
-        "209210675",
-        "Contiguo a Bugys Patriarca, San Ramon",
-        "1"
-    ]
+    {
+        "nombre": "Pedro Gómez",
+        "direccion": "Av. Central #45",
+        "correo": "pedro.gomez@mail.com"
+    },
+    {
+        "nombre": "Laura Ramírez",
+        "direccion": "Calle 9 #123",
+        "correo": "laura.ramirez@mail.com"
+    },
+    {
+        "nombre": "Carlos Fernández",
+        "direccion": "Barrio Escalante",
+        "correo": "carlos.fer@mail.com"
+    },
+    {
+        "nombre": "Lucía Herrera",
+        "direccion": "San Pedro Este",
+        "correo": "lucia.herrera@mail.com"
+    },
+    {
+        "nombre": "Luis Vargas",
+        "direccion": "Av. 2da #50",
+        "correo": "luis.vargas@mail.com"
+    },
+    {
+        "nombre": "Silvia Jiménez",
+        "direccion": "Residencial Lomas",
+        "correo": "silvia.j@mail.com"
+    },
+    {
+        "nombre": "Mario Quesada",
+        "direccion": "Guadalupe Oeste",
+        "correo": "mario.q@mail.com"
+    },
+    {
+        "nombre": "Patricia Arias",
+        "direccion": "Desamparados Centro",
+        "correo": "patricia.arias@mail.com"
+    },
+    {
+        "nombre": "Fernando Rojas",
+        "direccion": "Santa Ana Norte",
+        "correo": "fernando.rojas@mail.com"
+    },
+    {
+        "nombre": "Natalia Marín",
+        "direccion": "Curridabat #10",
+        "correo": "natalia.m@mail.com"
+    },
+    {
+        "nombre": "Daniel Castro",
+        "direccion": "Alajuelita",
+        "correo": "daniel.castro@mail.com"
+    },
+    {
+        "nombre": "Johana Sequeira",
+        "direccion": "Tres Ríos",
+        "correo": "johana.s@mail.com"
+    },
+    {
+        "nombre": "Erick Navarro",
+        "direccion": "Moravia",
+        "correo": "erick.n@mail.com"
+    },
+    {
+        "nombre": "Gabriela Soto",
+        "direccion": "La Unión",
+        "correo": "gabriela.soto@mail.com"
+    },
+    {
+        "nombre": "Jose Rodríguez",
+        "direccion": "San Antonio",
+        "correo": "jose.r@mail.com"
+    },
+    {
+        "nombre": "Alejandra Mata",
+        "direccion": "Paso Ancho",
+        "correo": "alejandra.mata@mail.com"
+    },
+    {
+        "nombre": "Cristian Chaves",
+        "direccion": "Barrio México",
+        "correo": "cristian.ch@mail.com"
+    },
+    {
+        "nombre": "Isabel Vega",
+        "direccion": "Hatillo 5",
+        "correo": "isabel.v@mail.com"
+    },
+    {
+        "nombre": "Oscar Méndez",
+        "direccion": "Rohrmoser",
+        "correo": "oscar.mendez@mail.com"
+    },
+    {
+        "nombre": "Melissa Cordero",
+        "direccion": "Escazú",
+        "correo": "melissa.cordero@mail.com"
+    }
 ]
