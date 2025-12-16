@@ -1,0 +1,21 @@
+id_vehiculo,id_agente,id_tipo,placa,marca,modelo
+1,1,1,A123BC,Yamaha,XTZ125
+2,2,2,B234CD,Giant,Escape 3
+3,3,3,C345DE,Toyota,Yaris
+4,4,1,D456EF,Suzuki,AX100
+5,5,4,E567FG,Nissan,NP300
+6,6,2,F678GH,Specialized,Sirrus
+7,7,1,G789HI,Honda,CBR250
+8,8,5,H890IJ,Xiaomi,Mi Scooter
+9,9,4,I901JK,Hyundai,Tucson
+10,10,3,J012KL,Chevrolet,Aveo
+11,11,2,K123LM,Trek,FX 2
+12,12,1,L234MN,Bajaj,Boxer
+13,13,5,M345NO,Segway,Ninebot
+14,14,3,N456OP,Kia,Picanto
+15,15,4,O567PQ,Ford,Ranger
+16,16,1,P678QR,Suzuki,GN125
+17,17,2,Q789RS,Scott,Speedster
+18,18,4,R890ST,Isuzu,D-Max
+19,19,3,S901TU,Mazda,2
+20,20,5,T012UV,Okai,Neon
