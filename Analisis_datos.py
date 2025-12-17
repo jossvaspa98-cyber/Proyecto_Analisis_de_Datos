@@ -4,117 +4,235 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def agentes_mas_eficientes_por_peso(entregas, agentes):
+def analizar_ventas_por_periodo(entregas, fecha_inicio=None, fecha_fin=None):
     try:
-        print("\n🚚 Análisis: Agentes más eficientes por peso entregado")
+        # Convertimos la lista de entregas a un DataFrame para trabajar más fácilmente con pandas
+        entregas_df = pd.DataFrame(entregas)
 
-        entregas.columns = entregas.columns.str.lower().str.strip()
-        agentes.columns = agentes.columns.str.lower().str.strip()
+        # Convertimos la columna 'fecha' a tipo datetime para poder hacer filtros de fechas
+        entregas_df['fecha'] = pd.to_datetime(entregas_df['fecha'], errors='coerce')
 
-        resumen = entregas.groupby('id_agente')['peso_kg'].sum().reset_index()
-        resumen.columns = ['id_agente', 'peso_total_kg']
+        # Filtramos por fecha de inicio si fue proporcionada
+        if fecha_inicio:
+            entregas_df = entregas_df[entregas_df['fecha'] >= pd.to_datetime(fecha_inicio)]
 
-        resultado = pd.merge(resumen, agentes, on='id_agente', how='left')
-        top = resultado.sort_values(by='peso_total_kg', ascending=False).head(5)
+        # Filtramos por fecha de fin si fue proporcionada
+        if fecha_fin:
+            entregas_df = entregas_df[entregas_df['fecha'] <= pd.to_datetime(fecha_fin)]
 
-        print(top[['nombre', 'correo', 'peso_total_kg']])
+        # Calculamos la suma total de pagos realizados en ese período
+        ingresos_totales = entregas_df['total_pago'].sum()
+
+        #  Calculamos el promedio de pago por cada entrega
+        ingresos_promedio = entregas_df['total_pago'].mean()
+
+        # Contamos cuántas entregas se hicieron en total
+        total_entregas = entregas_df.shape[0]
+
+        # Imprimimos en pantalla los resultados obtenidos
+        print("\n-----------------Análisis de Ventas-----------------\n")
+        print(f"Ingresos Totales: ${ingresos_totales:.2f}")
+        print(f"Ingresos Promedio por Entrega: ${ingresos_promedio:.2f}")
+        print(f"Total de Entregas: {total_entregas}")
+
+        # Agrupamos las entregas por fecha y sumamos los pagos por cada día
+        ventas_por_dia = entregas_df.groupby('fecha')['total_pago'].sum().reset_index()
+
+        # Creamos una gráfica de línea para ver las ventas por día
+        plt.plot(ventas_por_dia['fecha'], ventas_por_dia['total_pago'], marker='o', color='blue')
+        plt.title('Ventas Totales por Día')
+        plt.xlabel('Fecha')
+        plt.ylabel('Ingresos Totales ($)')
+        plt.grid(True)
+        plt.show()
 
     except Exception as e:
-        print("❌ Error en el análisis de agentes eficientes:", e)
+        # Si ocurre un error en cualquier parte del código, mostramos el error en consola
+        print(f"❌ Error en el análisis de ventas: {e}")
 
-
-def vehiculo_mas_usado(entregas, vehiculos,tiposVehiculos):
+def vehiculo_mas_usado(entregas, vehiculos, tiposVehiculos):
     try:
-        print("\n🚗 Análisis: Vehículo más utilizado")
+        # Convertimos los datos de entregas, vehículos y tipos de vehículos a DataFrames para realizar el análisis
+        entregas_df = pd.DataFrame(entregas)
+        vehiculos_df = pd.DataFrame(vehiculos)
+        tiposVehiculos_df = pd.DataFrame(tiposVehiculos)
 
-        entregas.columns = entregas.columns.str.lower().str.strip()
-        vehiculos.columns = vehiculos.columns.str.lower().str.strip()
-
-        conteo = entregas['id_vehiculo'].value_counts().reset_index()
+        # Contamos el número total de entregas realizadas por cada vehículo ('id_vehiculo')
+        # - Utilizamos value_counts para obtener el conteo de cada vehículo.
+        conteo = entregas_df['id_vehiculo'].value_counts().reset_index()
         conteo.columns = ['id_vehiculo', 'total_entregas']
-        
-        df = pd.merge(conteo, vehiculos, on='id_vehiculo', how='left')
 
-        # Unir vehículos con su tipo/descripción
-        df = pd.merge(df, tiposVehiculos, on='id_tipo', how='left')
-        
-        top = df.sort_values(by='total_entregas', ascending=False).head(3)
+        # Ordenamos los vehículos por la cantidad de entregas realizadas, mostrando solo los 5 principales
+        conteo = conteo.sort_values(by='total_entregas', ascending=False).head(5)
 
-        print(top[['id_vehiculo', 'marca', 'modelo','descripcion','total_entregas']])
+        # Combinamos los datos de entregas con los vehículos y tipos de vehículos
+        # - Esto añade información relevante como marca, modelo y descripción del vehículo usado.
+        top_vehiculos = pd.merge(conteo, vehiculos_df, on="id_vehiculo")
+        top_vehiculos = pd.merge(top_vehiculos, tiposVehiculos_df, on="id_tipo")
+
+        # Mostramos un reporte tabular en la consola con los resultados
+        print("\n-----------------Vehículos más usados-----------------\n")
+        print(top_vehiculos[['marca', 'modelo', 'descripcion', 'total_entregas']].to_markdown(index=False, tablefmt="grid"))
+
+        # Generamos un gráfico que muestra los modelos de vehículos más utilizados
+        # - Esto permite visualizar qué vehículos tienen la mayor actividad.
+        plt.bar(top_vehiculos['modelo'], top_vehiculos['total_entregas'], color='orange')
+        plt.title('Vehículos más usados')
+        plt.xlabel('Vehículo')
+        plt.ylabel('Total de entregas')
+        plt.xticks(rotation=45)
+        plt.show()
 
     except Exception as e:
-        print("❌ Error en el análisis de vehículo más usado:", e)
+        # Manejo de errores: Imprimimos un mensaje si ocurre algún problema durante el análisis.
+        print(f"❌ Ocurrió un error: {e}")
 
 
 def cliente_top_entregas(entregas, clientes):
     try:
-        print("\n🏆 Análisis: Cliente con más entregas")
-        entregas.columns = entregas.columns.str.lower().str.strip()
-        clientes.columns = clientes.columns.str.lower().str.strip()
-        conteo = entregas['id_cliente'].value_counts().reset_index()
-        conteo.columns = ['id_cliente', 'total_entregas']
-        resultado = pd.merge(conteo, clientes, on='id_cliente', how='left')
-        top = resultado.sort_values(by='total_entregas', ascending=False).head(5)
-        print(top[['id_cliente', 'nombre', 'direccion', 'total_entregas']])
+        # Convertimos los datos de entregas y clientes a DataFrames para realizar el análisis
+        entregas_df = pd.DataFrame(entregas)
+        clientes_df = pd.DataFrame(clientes)
+
+        # Contamos el número total de entregas realizadas por cada cliente ('id_cliente')
+        conteo_clientes = entregas_df['id_cliente'].value_counts().reset_index()
+        conteo_clientes.columns = ['id_cliente', 'total_entregas']
+
+        # Ordenamos los clientes por la cantidad de entregas realizadas, mostrando solo los 5 principales
+        conteo_clientes = conteo_clientes.sort_values(by='total_entregas', ascending=False).head(5)
+
+        # Combinamos los datos de entregas con información de clientes
+        # - Esto añade detalles como el nombre y dirección del cliente.
+        top_clientes = pd.merge(conteo_clientes, clientes_df, on="id_cliente")
+
+        # Mostramos un reporte tabular en la consola con los resultados
+        print("\n-----------------Clientes con más entregas-----------------\n")
+        print(top_clientes[['nombre', 'direccion', 'total_entregas']].to_markdown(index=False, tablefmt="grid"))
+
+        # Generamos un gráfico que muestra los clientes con más entregas realizadas
+        # - Esto permite visualizar qué clientes son los más activos.
+        plt.bar(top_clientes['nombre'], top_clientes['total_entregas'], color='green')
+        plt.title('Clientes con más entregas')
+        plt.xlabel('Cliente')
+        plt.ylabel('Total de entregas')
+        plt.xticks(rotation=45)
+        plt.show()
+
     except Exception as e:
-        print("❌ Error en el análisis de clientes con más entregas:", e)
+        # Manejo de errores: Imprimimos un mensaje si ocurre algún problema durante el análisis.
+        print(f"❌ Ocurrió un error: {e}")
 
 
-def peso_promedio_por_tipo_vehiculo(entregas, vehiculos, tiposvehiculos):
+def analizar_eficiencia_por_agente(entregas, agentes):
     try:
-        print("\n📦 Análisis: Peso promedio entregado por tipo de vehículo")
-        # Normalización de columnas
-        entregas.columns = entregas.columns.str.lower().str.strip()
-        vehiculos.columns = vehiculos.columns.str.lower().str.strip()
-        tiposvehiculos.columns = tiposvehiculos.columns.str.lower().str.strip()
-        # Unir entregas con vehículos
-        df = pd.merge(entregas, vehiculos, on='id_vehiculo', how='left')
-        # Unir con tipos de vehículos
-        df = pd.merge(df, tiposvehiculos, on='id_tipo', how='left')
-        # Agrupar por descripción del vehículo
-        promedio = (df.groupby('descripcion')['peso_kg'].mean().reset_index().sort_values(by='peso_kg', ascending=False))
-        promedio.columns = ['tipo_vehiculo', 'peso_promedio_kg']
-        print("\n📊 Peso promedio entregado por tipo de vehículo:")
-        print(promedio)
-        print(
-            "\n💡 Interpretación estratégica:"
-            "\nLos tipos de vehículo con mayor peso promedio son más adecuados"
-            "\npara entregas pesadas y deben priorizarse para ese tipo de servicio."
-        )
+        # Transformar las entregas y los agentes en tablas.
+        entregas_df = pd.DataFrame(entregas)
+        agentes_df = pd.DataFrame(agentes)
+
+        # Convertimos las columnas de hora de inicio y hora de fin a formato de fecha y hora
+        # Esto permite hacer operaciones matemáticas con ellas (como calcular duración)
+        entregas_df['hora_inicio'] = pd.to_datetime(entregas_df['hora_inicio'], errors='coerce')
+        entregas_df['hora_fin'] = pd.to_datetime(entregas_df['hora_fin'], errors='coerce')
+        
+        # Calculamos la duración de cada entrega en minutos
+        # Se obtiene restando la hora fin menos la hora inicio
+        entregas_df['duracion_min'] = (entregas_df['hora_fin'] - entregas_df['hora_inicio']).dt.total_seconds() / 60
+
+        # Calculamos la eficiencia como los minutos por cada kilómetro recorrido
+        # Esto nos dice cuántos minutos le toma al agente recorrer 1 km
+        entregas_df['eficiencia_min_km'] = entregas_df['duracion_min'] / entregas_df['distancia_km']
+
+        # Agrupamos por cada agente y calculamos su eficiencia promedio
+        # Así podemos ver qué tan rápido trabaja cada uno en promedio
+        eficiencia_por_agente = entregas_df.groupby('id_agente')['eficiencia_min_km'].mean().reset_index()
+        # Unimos los datos de eficiencia con los nombres de los agentes
+        eficiencia_por_agente = pd.merge(eficiencia_por_agente, agentes_df, on='id_agente')
+
+        # Mostramos una tabla en consola con el nombre del agente y su eficiencia
+        print("\n-----------------Eficiencia por Agente-----------------\n")
+        
+        print(eficiencia_por_agente[['nombre', 'eficiencia_min_km']].to_markdown(index=False, tablefmt="grid"))
+
+        # Ordenamos de más eficiente a menos eficiente para el gráfico
+        eficiencia_por_agente.sort_values('eficiencia_min_km', inplace=True)
+        
+        # Creamos un gráfico de barras para visualizar la eficiencia de cada agente
+        plt.bar(eficiencia_por_agente['nombre'], eficiencia_por_agente['eficiencia_min_km'], color='green')
+        plt.title('Eficiencia por Agente (min/km)')
+        plt.xlabel('Agente')
+        plt.ylabel('Minutos por Km')
+        plt.xticks(rotation=45)
+        plt.show()
+
     except Exception as e:
-        print("❌ Error en el análisis de peso promedio por tipo de vehículo:", e)
+        # Mostrar el error en pantalla si ocurre uno.
+        print(f"❌ Error en el análisis de eficiencia: {e}")
 
 
 
 
-
-def hora_mas_activa(entregas):
+def analizar_tipo_entregas(entregas):
     try:
-        print("\n🕓 Análisis: Hora más activa del día")
-        entregas.columns = entregas.columns.str.lower().str.strip()
-        # Asegurar que la columna existe
-        if 'hora_inicio' not in entregas.columns:
-            print("⚠️ No existe la columna 'hora_inicio' en los datos.")
-            return
-        # Convertir a datetime y extraer hora
-        entregas['hora_inicio'] = pd.to_datetime(entregas['hora_inicio'], errors='coerce')
-        entregas['hora'] = entregas['hora_inicio'].dt.hour
-        # Eliminar filas con hora nula
-        entregas = entregas.dropna(subset=['hora'])
-        conteo = entregas['hora'].value_counts().sort_index()
-        # Validar que hay datos
-                # Mostrar tabla con formato legible
-        print("Entregas por hora:")
-        for h, count in conteo.items():
-            hora_legible = f"{h:02d}:00"
-            print(f"{hora_legible} - {count} entregas")
+        # Convertimos la lista de entregas a un DataFrame de pandas para poder analizarla
+        entregas_df = pd.DataFrame(entregas)
 
-        # Obtener la hora con más entregas
-        hora_pico = conteo.idxmax()
-        total = conteo.max()
-        hora_formateada = f"{hora_pico:02d}:00"
+        # Contamos cuántas entregas hay por cada estado (Ej: "entregada", "pendiente", etc.)
+        # value_counts() hace el conteo por cada valor único en la columna 'estado'
+        tipo_entregas = entregas_df['estado'].value_counts().reset_index()
+        # Renombramos las columnas para que tengan nombres más claros
+        tipo_entregas.columns = ['estado', 'cantidad']
 
-        print(f"\n🔝 La hora con más entregas es: {hora_formateada} con {total} entregas")
+        # Mostramos los resultados como una tabla en la consola
+        print("\n-----------------Estado de las Entregas-----------------\n")
+        print(tipo_entregas.to_markdown(index=False, tablefmt="grid"))
+
+        # Creamos un gráfico circular (torta/pie chart) para visualizar la proporción de cada estado
+        # autopct='%1.1f%%' muestra el porcentaje en el gráfico
+        plt.pie(tipo_entregas['cantidad'], labels=tipo_entregas['estado'], autopct='%1.1f%%', startangle=90, colors=['green', 'red'])
+        plt.title('Distribución de Entregas por Estado')
+        # Muestra el gráfico en pantalla
+        plt.show()
 
     except Exception as e:
-        print("❌ Error en el análisis de hora más activa:", e)
+        print(f"❌ Error en el análisis de tipo de entregas: {e}")
+
+
+
+def analizar_horas_pico(entregas):
+    try:
+        # Convertimos la lista de entregas en un DataFrame para poder trabajar con pandas
+        entregas_df = pd.DataFrame(entregas)
+
+        # Convertimos la columna 'hora_inicio' a formato de fecha y hora
+        # Esto es necesario para poder extraer la hora después
+        entregas_df['hora_inicio'] = pd.to_datetime(entregas_df['hora_inicio'], errors='coerce')
+
+        # Extraemos solamente la hora (0 a 23) de la columna 'hora_inicio'
+        entregas_df['hora'] = entregas_df['hora_inicio'].dt.hour
+
+        # Contamos cuántas entregas se hicieron por cada hora del día
+        # sort_index() asegura que las horas estén en orden
+        horas_pico = entregas_df['hora'].value_counts().sort_index().reset_index()
+
+        # Renombramos las columnas para que tengan nombres más claros
+        horas_pico.columns = ['hora', 'total_entregas']
+
+        # Formateamos la hora para que se vea como "08:00", "14:00", etc.
+        horas_pico['hora_formateada'] = horas_pico['hora'].apply(lambda h: f"{h:02d}:00")
+
+        # Mostramos los resultados como una tabla
+        print("\n-----------------Horas Pico-----------------\n")
+        print(horas_pico[['hora_formateada', 'total_entregas']].to_markdown(index=False, tablefmt="grid"))
+
+        # Creamos un gráfico de barras para visualizar en qué horas hay más entregas
+        plt.bar(horas_pico['hora_formateada'], horas_pico['total_entregas'], color='orange')
+        plt.title('Horas Pico de Entregas')    
+        plt.xlabel('Hora')                        
+        plt.ylabel('Número de Entregas')          
+        plt.xticks(rotation=45)                    
+        plt.show()                                 
+
+    except Exception as e:
+        # Si ocurre un error, se muestra un mensaje explicando el problema
+        print(f"❌ Error en el análisis de horas pico: {e}")
+
