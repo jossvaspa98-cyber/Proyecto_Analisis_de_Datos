@@ -28,12 +28,12 @@ def main():
             #Imprimimos un título visual para el menú de opciones.
             print("\n📊 MENÚ DE ANÁLISIS DE VPDelivery")
             print("1. Carga de datos")
-            print("2. Ver agentes más eficientes")
+            print("2. Ver ventas por periodo")
             print("3. Ver vehículos más usados")
             print("4. Ver clientes top de entregas")
-            print("5. Ver peso promedio por tipo de vehículo")
-            print("6. Ver hora más activa")
-            print("7. Ver Vehiculo más eficiente por kilometro")
+            print("5. Ver eficiencia por agente")
+            print("6. Ver tipos de entregas por estado")
+            print("7. Ver horas pico de entregas")
             print("0. Salir")
             
             #Muestramos las diferentes opciones disponibles para análisis en la aplicación.
@@ -69,7 +69,7 @@ def main():
                 #Si elige 0, el programa se despide y sale del bucle para finalizar la ejecución.
             elif opcion == "0":
                 #
-                print("👋 ¡Hasta luego!")
+                print("👋 ¡Hasta luego!  Muchas gracias por utilizar el sistema de análisis de VPDelivery.")
                 break
             else:
                 #Si el usuario escribe algo que no está en el menú, muestra un mensaje de advertencia.

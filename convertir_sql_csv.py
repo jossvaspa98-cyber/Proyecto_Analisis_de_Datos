@@ -60,7 +60,7 @@ def convertir_sql_a_csv(archivo_sql):
             df.to_csv(f"{nombre_tabla}.csv", index=False, encoding='utf-8')
             # Confirmación de creación del archivo CSV
             # Mostramos un mensaje indicando que el archivo CSV se creó correctamente, incluyendo la cantidad de registros procesados.
-            print(f"{nombre_tabla}.csv creado con {len(df)} registros.")
+            print(f"✅ {nombre_tabla}.csv creado con {len(df)} registros.")
             
         print("¡Proceso completado!")
     # Si ocurre algún error durante el proceso por ejemplo, si el archivo no existe, mostramos el error en pantalla.

@@ -123,51 +123,46 @@ def cliente_top_entregas(entregas, clientes):
         print(f"❌ Ocurrió un error: {e}")
 
 
+import pandas as pd
+import matplotlib.pyplot as plt
+
 def analizar_eficiencia_por_agente(entregas, agentes):
     try:
-        # Transformar las entregas y los agentes en tablas.
+        # Convertir listas de datos en tablas usando pandas
         entregas_df = pd.DataFrame(entregas)
         agentes_df = pd.DataFrame(agentes)
 
-        # Convertimos las columnas de hora de inicio y hora de fin a formato de fecha y hora
-        # Esto permite hacer operaciones matemáticas con ellas (como calcular duración)
+        # Convertir horas de inicio y fin a formato fecha
         entregas_df['hora_inicio'] = pd.to_datetime(entregas_df['hora_inicio'], errors='coerce')
         entregas_df['hora_fin'] = pd.to_datetime(entregas_df['hora_fin'], errors='coerce')
-        
-        # Calculamos la duración de cada entrega en minutos
-        # Se obtiene restando la hora fin menos la hora inicio
+
+        # Calcular el tiempo total de cada entrega en minutos
         entregas_df['duracion_min'] = (entregas_df['hora_fin'] - entregas_df['hora_inicio']).dt.total_seconds() / 60
 
-        # Calculamos la eficiencia como los minutos por cada kilómetro recorrido
-        # Esto nos dice cuántos minutos le toma al agente recorrer 1 km
+        # Calcular la eficiencia como minutos por kilómetro
         entregas_df['eficiencia_min_km'] = entregas_df['duracion_min'] / entregas_df['distancia_km']
 
-        # Agrupamos por cada agente y calculamos su eficiencia promedio
-        # Así podemos ver qué tan rápido trabaja cada uno en promedio
-        eficiencia_por_agente = entregas_df.groupby('id_agente')['eficiencia_min_km'].mean().reset_index()
-        # Unimos los datos de eficiencia con los nombres de los agentes
+        # Agrupar por agente para calcular promedio de eficiencia y total de kilómetros
+        eficiencia_por_agente = entregas_df.groupby('id_agente').agg({
+            # Promedio de eficiencia por agente
+            'eficiencia_min_km': 'mean',
+            # Suma de kilómetros recorridos por agente
+            'distancia_km': 'sum'
+        }).reset_index()
+
+        # Unir con los nombres de los agentes
         eficiencia_por_agente = pd.merge(eficiencia_por_agente, agentes_df, on='id_agente')
 
-        # Mostramos una tabla en consola con el nombre del agente y su eficiencia
-        print("\n-----------------Eficiencia por Agente-----------------\n")
-        
-        print(eficiencia_por_agente[['nombre', 'eficiencia_min_km']].to_markdown(index=False, tablefmt="grid"))
+        # Ordenar por eficiencia (menor min/km = más eficiente) y luego tomar el top 3
+        eficiencia_top_3 = eficiencia_por_agente.sort_values('eficiencia_min_km').head(3)
 
-        # Ordenamos de más eficiente a menos eficiente para el gráfico
-        eficiencia_por_agente.sort_values('eficiencia_min_km', inplace=True)
-        
-        # Creamos un gráfico de barras para visualizar la eficiencia de cada agente
-        plt.bar(eficiencia_por_agente['nombre'], eficiencia_por_agente['eficiencia_min_km'], color='green')
-        plt.title('Eficiencia por Agente (min/km)')
-        plt.xlabel('Agente')
-        plt.ylabel('Minutos por Km')
-        plt.xticks(rotation=45)
-        plt.show()
+        # Mostrar tabla del top 3
+        print("\n-----------------Top 3 Agentes Más Eficientes-----------------\n")
+        # Visualización mejorada en formato Markdown con estilo de tabla grid
+        print(eficiencia_top_3[['nombre', 'eficiencia_min_km', 'distancia_km']].to_markdown(index=False, tablefmt="grid"))
 
     except Exception as e:
-        # Mostrar el error en pantalla si ocurre uno.
-        print(f"❌ Error en el análisis de eficiencia: {e}")
-
+        print(f"Error: {e}")
 
 
 
