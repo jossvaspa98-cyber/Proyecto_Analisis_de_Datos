@@ -38,7 +38,7 @@ def main():
             
             #Muestramos las diferentes opciones disponibles para análisis en la aplicación.
             #le pedimos al usuario que escriba una opción del menú.
-            opcion = input("Selecciona una opción (0-9): ")
+            opcion = input("Selecciona una opción (0-7): ")
             if opcion == "1":
                 #Llamamos a la función cargar_datos() que lee los archivos CSV y devuelve los DataFrames con los datos.
                 # Se guardan en variables para usarlos más adelante.
